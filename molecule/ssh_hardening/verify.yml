@@ -4,6 +4,10 @@
   become: true
   roles:
     - geerlingguy.git
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
   tasks:
     - name: install fake SuSE-release for cinc compatibility
       copy:

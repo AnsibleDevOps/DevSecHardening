@@ -2,12 +2,12 @@
 - name: Verify
   hosts: all
   become: true
+  roles:
+    - geerlingguy.git
   environment:
     http_proxy: "{{ lookup('env', 'http_proxy') }}"
     https_proxy: "{{ lookup('env', 'https_proxy') }}"
     no_proxy: "{{ lookup('env', 'no_proxy') }}"
-  roles:
-    - geerlingguy.git
   tasks:
     - name: install fake SuSE-release for cinc compatibility
       copy:
@@ -27,15 +27,10 @@
         state: present
       when: ansible_facts.os_family == 'Suse'
 
-    - name: Run the equivalent of "apt-get update" as a separate step
-      apt:
-        update_cache: true
-      when: ansible_facts.os_family == 'Debian'
-
-    - name: install required tools on debian
-      apt:
-        name: procps
-      when: ansible_facts.os_family == 'Debian'
+    - name: install crypto compat modules on fedora
+      dnf:
+        name: libxcrypt-compat
+      when: ansible_facts.distribution == 'Fedora'
 
     - name: download cinc-auditor
       get_url:
@@ -47,7 +42,7 @@
       shell: "bash /tmp/install.sh -s -- -P cinc-auditor -v 4"
 
     - name: Execute cinc-auditor tests
-      command: "/opt/cinc-auditor/bin/cinc-auditor exec --no-show-progress --no-color --no-distinct-exit https://github.com/dev-sec/linux-baseline.git"
+      command: "/opt/cinc-auditor/bin/cinc-auditor exec --no-show-progress --no-color --no-distinct-exit https://github.com/dev-sec/postgres-baseline.git"
       register: test_results
       changed_when: false
       ignore_errors: true
@@ -60,17 +55,3 @@
       fail:
         msg: "Inspec failed to validate"
       when: test_results.rc != 0
-
-    # test if variable can be overridden
-    - name: workaround for https://github.com/ansible/ansible/issues/66304
-      set_fact:
-        ansible_virtualization_type: "docker"
-        os_env_umask: "027 #override"
-
-    - include_role:
-        name: os_hardening
-
-    - name: verify os_env_umask
-      shell:
-        cmd: "grep '027 #override' /etc/login.defs"
-      changed_when: false

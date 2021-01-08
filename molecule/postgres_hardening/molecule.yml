@@ -2,12 +2,12 @@
 dependency:
   name: galaxy
   options:
-    role-file: molecule/os_hardening/requirements.yml
+    role-file: molecule/postgres_hardening/requirements.yml
 driver:
   name: docker
-lint: |
-  yamllint roles/os_hardening/ molecule/os_hardening/ .github/workflows/os_hardening.yml
-  ansible-lint roles/os_hardening/
+#lint: |
+#  yamllint roles/postgres_hardening/ molecule/postgres_hardening/ .github/workflows/postgres_hardening.yml
+#  ansible-lint roles/postgres_hardening/
 platforms:
   - name: instance
     image: "rndmh3ro/docker-${MOLECULE_DISTRO}-ansible:latest"

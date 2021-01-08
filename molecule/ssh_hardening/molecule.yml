@@ -21,8 +21,11 @@ platforms:
     capabilities:
       - SYS_ADMIN
     tty: true
-    environment:
+    env:
       container: docker
+      http_proxy: ${http_proxy}
+      https_proxy: ${https_proxy}
+      no_proxy: ${no_proxy}
 provisioner:
   name: ansible
   config_options:

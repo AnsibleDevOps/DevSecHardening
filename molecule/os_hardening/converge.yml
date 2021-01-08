@@ -2,6 +2,10 @@
 - name: wrapper playbook for kitchen testing "ansible-os-hardening" with custom vars for testing
   hosts: all
   become: true
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'https_proxy') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
   collections:
     - devsec.hardening
   tasks:
